@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo_round.png" alt="File Manager Pro Logo Rounded" width="250" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="logo.png" alt="File Manager Pro Logo Rounded" width="250" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </p>
 
 
