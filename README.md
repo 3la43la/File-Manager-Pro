@@ -1,4 +1,7 @@
-&nbsp;
+<p align="center">
+  <img src="logo_round.png" alt="File Manager Pro Logo Rounded" width="250" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</p>
+
 
 # 📂 مدير الملفات الاحترافي | Professional File Manager
 
@@ -117,6 +120,3 @@ pip install PyQt6 arabic-reshaper python-bidi
 
 **تم التطوير بواسطة: Alaa.ksa** 🚀
 
-* * *
-
-**هل تريد مني المساعدة في تحويل الكود بالكامل إلى ملف تنفيذي (.exe) ليرفق مع هذا الدليل؟**
