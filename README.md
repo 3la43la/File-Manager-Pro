@@ -1,6 +1,10 @@
-&lt;p align="center"&gt;  
-  &lt;img src="logo.png" alt="File Manager Pro Logo" width="250"&gt;  
-&lt;/p&gt;
+<p align="center">
+  <img src="github_cover.png" alt="Alaa.ksa GitHub Cover" width="100%" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+</p>
+
+<p align="center">
+  <img src="logo_round.png" alt="File Manager Pro Logo Rounded" width="250" style="border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</p>
 
 &nbsp;
 

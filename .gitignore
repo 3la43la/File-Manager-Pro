@@ -3,3 +3,5 @@ __pycache__/
 venv/
 .vscode/
 البرمجة
+main.py
+move_media.py
