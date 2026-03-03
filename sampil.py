@@ -4,7 +4,8 @@ import shutil
 import platform
 import subprocess
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, 
-                             QWidget, QFileDialog, QLabel, QMessageBox, QTabWidget, QListWidget)
+                             QWidget, QFileDialog, QLabel, QMessageBox, QTabWidget, 
+                             QListWidget, QHBoxLayout)
 from PyQt6.QtCore import Qt
 import arabic_reshaper
 
@@ -15,7 +16,6 @@ class FolderManagerApp(QMainWindow):
         self.initUI()
 
     def ar(self, text):
-        """إصلاح ربط الحروف العربية"""
         if not text: return ""
         return arabic_reshaper.reshape(text)
 
@@ -32,27 +32,30 @@ class FolderManagerApp(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle(self.ar("مدير الملفات الاحترافي"))
-        self.setFixedSize(550, 500)
+        self.setFixedSize(550, 550)
         self.tabs = QTabWidget()
-        
         self.tab1 = QWidget()
         self.init_tab1()
-        
         self.tab2 = QWidget()
         self.init_tab2()
-
         self.tabs.addTab(self.tab1, self.ar("تفريغ مجلدات"))
         self.tabs.addTab(self.tab2, self.ar("نقل ملفات محددة"))
         self.setCentralWidget(self.tabs)
 
     def init_tab1(self):
         layout = QVBoxLayout()
-        label = QLabel(self.ar("سيقوم هذا الخيار بسحب جميع الملفات من المجلدات الفرعية للمجلد الرئيسي وحذفها."))
+        layout.setContentsMargins(20, 20, 20, 20)
+        # توسيط العبارة في التبويب الأول أيضاً
+        label = QLabel(self.ar("تنظيم ذكي: استخراج كافة الملفات من المجلدات الفرعية وجمعها في مكان واحد، مع تنظيف المجلدات الفارغة تلقائياً."))
         label.setWordWrap(True)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter) # التعديل هنا: توسيط
+        label.setStyleSheet("font-size: 14px; color: #27ae60; padding: 10px;")
+        
         btn = QPushButton(self.ar("بدء عملية التفريغ"))
-        btn.setMinimumHeight(60)
-        btn.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold; border-radius: 10px;")
+        btn.setMinimumHeight(70)
+        btn.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold; border-radius: 12px; font-size: 16px;")
         btn.clicked.connect(self.flatten_process)
+        
         layout.addWidget(label)
         layout.addStretch()
         layout.addWidget(btn)
@@ -60,13 +63,22 @@ class FolderManagerApp(QMainWindow):
 
     def init_tab2(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
         self.selected_files = []
         
-        label = QLabel(self.ar("قائمة الملفات المختارة (تظهر بخط غامق):"))
-        label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        # --- التعديل الجوهري: توسيط العبارة المطلوبة ---
+        label = QLabel(self.ar("قائمة الملفات المختارة :"))
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter) # محاذاة في الوسط تماماً
+        label.setStyleSheet("""
+            font-weight: bold; 
+            font-size: 14px; 
+            color: #27ae60; 
+            margin-bottom: 10px;
+            padding: 5px;
+        """)
         
-        # التعديل هنا: خلفية بيضاء وخط غامق
         self.file_list_widget = QListWidget()
+        self.file_list_widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.file_list_widget.setStyleSheet("""
             QListWidget {
                 border: 2px solid #dcdde1;
@@ -75,57 +87,35 @@ class FolderManagerApp(QMainWindow):
                 color: #2f3640;
                 font-weight: bold;
                 font-size: 13px;
-                padding: 10px;
-            }
-            QListWidget::item {
                 padding: 5px;
-                border-bottom: 1px solid #f1f2f6;
             }
         """)
 
-        btn_select = QPushButton(self.ar("1. اختيار الملفات"))
-        btn_select.setMinimumHeight(45)
-        btn_select.setStyleSheet("background-color: #2980b9; color: white; font-weight: bold; border-radius: 10px;")
+        list_btns_layout = QHBoxLayout()
+        btn_select = QPushButton(self.ar("إضافة ملفات"))
+        btn_select.setMinimumHeight(35)
+        btn_clear = QPushButton(self.ar("تفريغ القائمة"))
+        btn_clear.setMinimumHeight(35)
+        btn_clear.setStyleSheet("color: #e74c3c;")
         btn_select.clicked.connect(self.select_files)
+        btn_clear.clicked.connect(self.clear_list)
+        list_btns_layout.addWidget(btn_select)
+        list_btns_layout.addWidget(btn_clear)
 
-        btn_move = QPushButton(self.ar("2. تحديد الوجهة ونقل الملفات"))
-        btn_move.setMinimumHeight(60)
-        btn_move.setStyleSheet("background-color: #2980b9; color: white; font-weight: bold; border-radius: 10px; font-size: 16px;")
+        btn_move = QPushButton(self.ar("تحديد الوجهة وبدء النقل"))
+        btn_move.setMinimumHeight(65)
+        btn_move.setStyleSheet("background-color: #2980b9; color: white; font-weight: bold; border-radius: 12px; font-size: 16px;")
         btn_move.clicked.connect(self.move_specific_files)
 
         layout.addWidget(label)
         layout.addWidget(self.file_list_widget)
-        layout.addWidget(btn_select)
+        layout.addLayout(list_btns_layout)
         layout.addStretch()
         layout.addWidget(btn_move)
         self.tab2.setLayout(layout)
 
-    def select_files(self):
-        files, _ = QFileDialog.getOpenFileNames(self, self.ar("اختر الملفات"))
-        if files:
-            self.selected_files = files
-            self.file_list_widget.clear()
-            for f in files:
-                self.file_list_widget.addItem(os.path.basename(f))
-
-    def move_specific_files(self):
-        if not self.selected_files:
-            self.show_message("تنبيه", "يرجى اختيار ملفات أولاً!")
-            return
-        dest_dir = QFileDialog.getExistingDirectory(self, self.ar("اختر الوجهة"))
-        if not dest_dir: return
-        try:
-            for file_path in self.selected_files:
-                dest_path = os.path.join(dest_dir, os.path.basename(file_path))
-                shutil.move(file_path, self.get_unique_path(dest_path))
-            self.show_message("نجاح", "تم نقل الملفات بنجاح.")
-            self.file_list_widget.clear()
-            self.selected_files = []
-            self.open_folder_universal(dest_dir)
-        except Exception as e: self.show_message("خطأ", str(e))
-
     def flatten_process(self):
-        target_dir = QFileDialog.getExistingDirectory(self, self.ar("اختر المجلد"))
+        target_dir = QFileDialog.getExistingDirectory(self, self.ar("اختر المجلد المستهدف"))
         if not target_dir: return
         try:
             count = 0
@@ -136,8 +126,38 @@ class FolderManagerApp(QMainWindow):
                         shutil.move(src, self.get_unique_path(dst))
                         count += 1
                 if root_path != target_dir: os.rmdir(root_path)
-            self.show_message("نجاح", f"تم نقل {count} ملف.")
+            self.show_message("نجاح", f"اكتملت العملية! تم نقل {count} ملف بنجاح.")
             self.open_folder_universal(target_dir)
+        except Exception as e: self.show_message("خطأ", str(e))
+
+    def select_files(self):
+        files, _ = QFileDialog.getOpenFileNames(self, self.ar("اختر الملفات"))
+        if files:
+            self.selected_files.extend(files)
+            self.update_list_display()
+
+    def clear_list(self):
+        self.selected_files = []
+        self.file_list_widget.clear()
+
+    def update_list_display(self):
+        self.file_list_widget.clear()
+        for f in self.selected_files:
+            self.file_list_widget.addItem(os.path.basename(f))
+
+    def move_specific_files(self):
+        if not self.selected_files:
+            self.show_message("تنبيه", "يرجى اختيار ملفات أولاً!")
+            return
+        dest_dir = QFileDialog.getExistingDirectory(self, self.ar("اختر وجهة النقل"))
+        if not dest_dir: return
+        try:
+            for file_path in self.selected_files:
+                dest_path = os.path.join(dest_dir, os.path.basename(file_path))
+                shutil.move(file_path, self.get_unique_path(dest_path))
+            self.show_message("تم النقل", "تم نقل جميع الملفات بنجاح.")
+            self.clear_list()
+            self.open_folder_universal(dest_dir)
         except Exception as e: self.show_message("خطأ", str(e))
 
     def get_unique_path(self, path):
